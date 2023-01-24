@@ -13,11 +13,27 @@ import web4 from '../public/web4.png';
 import web5 from '../public/web5.png';
 import web6 from '../public/web6.png';
 import React, { useState, useEffect } from 'react';
-import { smooth } from './utilities/smooth-scroll';
 
 export default function Home() {
   //set dark/light mode
   const [darkMode, setDarkMode] = useState(false);
+
+  //for smooth nav showing
+  function smooth(func, wait, immediate) {
+    var timeout;
+    return function () {
+      var context = this,
+        args = arguments;
+      var later = function () {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      var callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  }
 
   //show/hide nav on scroll
   const [prevScrollPos, setPrevScrollPos] = useState(0);

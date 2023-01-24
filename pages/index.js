@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { BsFillMoonStarsFill } from 'react-icons/bs';
 import { AiFillGithub, AiFillLinkedin, AiFillYoutube } from 'react-icons/ai';
 import Image from 'next/image';
-import wave from '../public/wave.png';
+import avatar from '../public/avatar.png';
 import code from '../public/code.png';
 import design from '../public/design.png';
 import consulting from '../public/consulting.png';
@@ -12,79 +12,34 @@ import web3 from '../public/web3.png';
 import web4 from '../public/web4.png';
 import web5 from '../public/web5.png';
 import web6 from '../public/web6.png';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { smooth } from './utilities/smooth-scroll';
 
 export default function Home() {
+  //set dark/light mode
   const [darkMode, setDarkMode] = useState(false);
 
-  //make nav scroll inout
-  (function () {
-    var doc = document.documentElement;
-    var w = window;
+  //show/hide nav on scroll
+  const [prevScrollPos, setPrevScrollPos] = useState(0);
+  const [visible, setVisible] = useState(true);
 
-    /*
-    define four variables: curScroll, prevScroll, curDirection, prevDirection
-    */
+  const handleScroll = smooth(() => {
+    const currentScrollPos = window.pageYOffset;
 
-    var curScroll;
-    var prevScroll = w.scrollY || doc.scrollTop;
-    var curDirection = 0;
-    var prevDirection = 0;
+    setVisible(
+      (prevScrollPos > currentScrollPos &&
+        prevScrollPos - currentScrollPos > 70) ||
+        currentScrollPos < 10
+    );
 
-    /*
-    how it works:
-    -------------
-    create a scroll event listener
-    create function to check scroll position on each scroll event,
-    compare curScroll and prevScroll values to find the scroll direction
-    scroll up - 1, scroll down - 2, initial - 0
-    then set the direction value to curDirection
-    compare curDirection and prevDirection
-    if it is different, call a function to show or hide the header
-    example:
-    step 1: user scrolls down: curDirection 2, prevDirection 0 --> hide header
-    step 2: user scrolls down again: curDirection 2, prevDirection 2 --> already hidden, do nothing
-    step 3: user scrolls up: curDirection 1, prevDirection 2 --> show header
-    */
+    setPrevScrollPos(currentScrollPos);
+  }, 50);
 
-    var header = document.querySelector('.navigation');
-    var toggled;
-    var threshold = 200;
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
 
-    var checkScroll = function () {
-      curScroll = w.scrollY || doc.scrollTop;
-      if (curScroll > prevScroll) {
-        // scrolled down
-        curDirection = 2;
-      } else {
-        //scrolled up
-        curDirection = 1;
-      }
-
-      if (curDirection !== prevDirection) {
-        toggled = toggleHeader();
-      }
-
-      prevScroll = curScroll;
-      if (toggled) {
-        prevDirection = curDirection;
-      }
-    };
-
-    var toggleHeader = function () {
-      toggled = true;
-      if (curDirection === 2 && curScroll > threshold) {
-        header.classList.add('hide');
-      } else if (curDirection === 1) {
-        header.classList.remove('hide');
-      } else {
-        toggled = false;
-      }
-      return toggled;
-    };
-
-    window.addEventListener('scroll', checkScroll);
-  })();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [prevScrollPos, visible, handleScroll]);
 
   return (
     <div className={darkMode ? 'dark' : ''}>
@@ -115,26 +70,33 @@ export default function Home() {
           content="HTML, CSS, JavaScript, programming, ReactJS, Next.JS Portfolio"
         ></meta>
       </Head>
-      <nav className="navigation py-10 px-5 md:px-20 lg:px-40 flex justify-between bg-gray-100 dark:bg-gray-800">
+      <nav
+        style={{ top: visible ? '0' : '-140px' }}
+        className="navigation py-10 px-5 md:px-20 lg:px-40 flex justify-between bg-gray-100 dark:bg-gray-800"
+      >
         <a
           href="https://github.com/MirosBL45"
           target="_blank"
           title="Miroslav's GitHub"
         >
-          <h1 className="text-xl font-burtons dark:text-gray-400">miroslav</h1>
+          <h1 className="resume text-xl font-burtons dark:text-gray-400">
+            miroslav
+          </h1>
         </a>
         <ul className="flex items-center">
           <li>
             <BsFillMoonStarsFill
               onClick={() => setDarkMode(!darkMode)}
-              className="cursor-pointer text-2xl dark:text-gray-400"
-              title="switch dark mode"
+              className="resume cursor-pointer text-2xl dark:text-gray-400"
+              title="switch dark/light mode"
             />
           </li>
-          <li>
+          <li className="resume">
             <a
               className="bg-gradient-to-r from-cyan-500 to-red-500 text-white px-4 py-2 rounded-md ml-8 dark:text-gray-300"
-              href="#"
+              href="https://www.linkedin.com/in/mj888/"
+              target="_blank"
+              title="Miroslav's Linkedin"
             >
               Resume
             </a>
@@ -145,7 +107,7 @@ export default function Home() {
         {/* LANDING PAGE */}
         <section className="min-h-screen">
           <div className="text-center p-10">
-            <h2 className="text-5xl py-2 text-teal-600 font-medium md:text-6xl">
+            <h2 className="mt-20 text-5xl py-2 text-teal-600 font-medium md:text-6xl">
               Dimitri Marco
             </h2>
             <h3 className="text-2xl py-2 md:text-3xl dark:text-gray-500">
@@ -174,7 +136,8 @@ export default function Home() {
             <AiFillYoutube />
           </div>
           <div className="relative mx-auto bg-gradient-to-b from-teal-500 rounded-full h-60 w-60 mt-20 mb-20 overflow-hidden sm:h-70 sm:w-70 md:h-96 md:w-96">
-            <Image src={wave} alt="waving" layout="fill" objectFit="cover" />
+            <Image src={avatar} alt="waving" />
+            {/* objectFit="cover" */}
           </div>
         </section>
         {/* SERVICES */}
@@ -297,7 +260,6 @@ export default function Home() {
                 className="rounded-lg object-cover"
                 width={'100%'}
                 height={'100%'}
-                layout="responsive"
                 src={web1}
                 alt="website1"
                 title="work example"
@@ -308,7 +270,6 @@ export default function Home() {
                 className="rounded-lg object-cover"
                 width={'100%'}
                 height={'100%'}
-                layout="responsive"
                 src={web2}
                 alt="website2"
                 title="work example"
@@ -319,7 +280,6 @@ export default function Home() {
                 className="rounded-lg object-cover"
                 width={'100%'}
                 height={'100%'}
-                layout="responsive"
                 src={web3}
                 alt="website3"
                 title="work example"
@@ -330,7 +290,6 @@ export default function Home() {
                 className="rounded-lg object-cover"
                 width={'100%'}
                 height={'100%'}
-                layout="responsive"
                 src={web4}
                 alt="website4"
                 title="work example"
@@ -341,7 +300,6 @@ export default function Home() {
                 className="rounded-lg object-cover"
                 width={'100%'}
                 height={'100%'}
-                layout="responsive"
                 src={web5}
                 alt="website5"
                 title="work example"
@@ -352,7 +310,6 @@ export default function Home() {
                 className="rounded-lg object-cover"
                 width={'100%'}
                 height={'100%'}
-                layout="responsive"
                 src={web6}
                 alt="website6"
                 title="work example"
